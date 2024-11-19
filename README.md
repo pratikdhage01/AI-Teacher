@@ -1,5 +1,4 @@
-# Demo Video
-https://github.com/Surbh77/AI-teacher/assets/108724393/35b67b0a-bc67-48b0-b4fc-f012fdca376a
+
 
 # Installation
 Just clone this git repository and go live with index.html the website will start
