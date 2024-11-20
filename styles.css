@@ -70,14 +70,31 @@ html {
 }
 
 #loading {
-    display: block;
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    height: 50px;
-    font-family: Arial;
-    font-size: 20px;
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    margin: 10px auto;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 #conversation {
@@ -181,6 +198,175 @@ html {
 
 #assesmentsubmit{
     display: none;
+}
+
+.summary-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.6;
+    font-family: Arial, sans-serif;
+}
+
+.summary-content h3 {
+    color: #2c3e50;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-size: 1.3em;
+}
+
+.summary-content p {
+    color: #34495e;
+    margin-bottom: 16px;
+    font-size: 1.1em;
+    text-align: justify;
+}
+
+#content-summary {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* Add some spacing between sections */
+.summary-content h3:not(:first-child) {
+    margin-top: 32px;
+}
+
+/* Style for important points */
+.summary-content p strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .summary-content {
+        padding: 15px;
+    }
+    
+    .summary-content h3 {
+        font-size: 1.2em;
+    }
+    
+    .summary-content p {
+        font-size: 1em;
+    }
+}
+
+.teaching-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    line-height: 1.8;
+    font-family: 'Arial', sans-serif;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.greeting {
+    color: #2c3e50;
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.question {
+    color: #e67e22;
+    font-size: 1.2em;
+    margin: 20px 0;
+    font-weight: 500;
+    padding-left: 20px;
+    border-left: 4px solid #e67e22;
+}
+
+.key-point {
+    color: #2980b9;
+    font-size: 1.2em;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: rgba(41, 128, 185, 0.1);
+    border-radius: 8px;
+}
+
+.teaching-text {
+    color: #34495e;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    line-height: 1.8;
+    text-align: justify;
+}
+
+/* Highlight important concepts */
+.teaching-text strong {
+    color: #16a085;
+    font-weight: 600;
+}
+
+/* Add some visual separation between sections */
+.teaching-content > *:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .teaching-content {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .greeting {
+        font-size: 1.5em;
+    }
+    
+    .question, .key-point {
+        font-size: 1.1em;
+    }
+    
+    .teaching-text {
+        font-size: 1em;
+    }
+}
+
+.error {
+    color: #e74c3c;
+    padding: 15px;
+    background-color: #fde8e8;
+    border-left: 4px solid #e74c3c;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+#loading {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#captions-container {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    max-width: 80%;
+    text-align: center;
+    z-index: 1000;
+}
+
+#captions {
+    font-size: 1.2em;
+    line-height: 1.4;
+    font-family: Arial, sans-serif;
 }
 
 
