@@ -7,22 +7,19 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="learning"></div>
+  <div id="file-upload-section">
+    <h2>Upload Your Learning Material</h2>
+    <input type="file" id="fileInput" accept=".pdf,.pptx,.txt">
+    <button id="uploadButton">Upload and Start</button>
+  </div>
+
   <div id="avatar"></div>
 
-  <div id="assesment">
-    <h1>AI TEACHER</h1>
-    <p>Here is the summarized text for your uploaded content!</p>
-      <p>HAPPY LEARNING!<br><br></p>
+  <div id="loading" style="display: none;">
+      Processing file...
+      <div class="spinner"></div>
   </div>
 
-  <div id="controls">
-      <div id="speak" type="button" value="Ask me">Ask Me</div>
-      <div id="avatarButton1" class="button">Avatar 1</div>
-      <div id="avatarButton2" class="button">Avatar 2</div>
-  </div>
-  <div id="take-assesment">Take Assesment</div>
-    <div id="loading"></div>
   <div>
     <button id="startButton">Start Speaking</button>
   </div>
@@ -52,8 +49,11 @@
       };
       let eyeBlinkIndex = null;
 
-      // Predefined text to speak
-      const speechText = `Hello! I am your virtual avatar.`;
+      // Add new variables for file handling
+      let processedText = '';
+
+      // Modify the speechText variable to be dynamic
+      let speechText = '';
 
       // Add new variables for teacher-specific gestures
       let isExplaining = false;
@@ -66,55 +66,55 @@
       let targetRotationX = 0;
       let targetRotationY = 0;
 
-      // Add this function to track mouse movement
+      // Add movement delay variables
+      let lastMovementTime = 0;
+      const MOVEMENT_DELAY = 2000; // 2 seconds between movements
+
       function setupMouseTracking() {
           document.addEventListener('mousemove', (event) => {
+              const currentTime = Date.now();
+              if (currentTime - lastMovementTime < MOVEMENT_DELAY) {
+                  return; // Skip if not enough time has passed
+              }
+              
               // Get mouse position relative to the window center
               mouseX = (event.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
               mouseY = (event.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
               
               // Convert mouse position to rotation angles
-              targetRotationY = mouseX * 0.5; // Horizontal look
-              targetRotationX = -mouseY * 0.3; // Vertical look (inverted)
+              targetRotationY = mouseX * 0.3; // Reduced rotation amount
+              targetRotationX = -mouseY * 0.2; // Reduced rotation amount
               
-              // Debug log
-              console.log('Mouse moved:', { mouseX, mouseY, targetRotationX, targetRotationY });
+              lastMovementTime = currentTime;
           });
       }
 
       function init() {
           scene = new THREE.Scene();
-          camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
-          camera.position.set(0, 1.1, 5.5);
+          camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+          camera.position.set(0, 1.5, 4);
+          camera.lookAt(0, 0, 0);
 
           renderer = new THREE.WebGLRenderer({ 
               antialias: true,
-              alpha: true  // Add this line to enable transparency
+              alpha: true
           });
           renderer.setSize(window.innerWidth, window.innerHeight);
-          // renderer.setClearColor(0xf0f0f0);  // Remove or comment out this line
           document.body.appendChild(renderer.domElement);
 
-          // Create controls
-          const controls = new THREE.OrbitControls(camera, renderer.domElement);
-          controls.enableDamping = true;
-          controls.dampingFactor = 0.25;
-          controls.enableZoom = false;
-          controls.enableRotate = false;
-          controls.enablePan = false;
-
-          // Lighting
-          const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+          // Enhanced lighting setup
+          const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
           scene.add(ambientLight);
 
-          const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-          directionalLight.position.set(2, 5, 7.5);
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+          directionalLight.position.set(0, 10, 10);
           scene.add(directionalLight);
 
-          // Setup mouse tracking
-          setupMouseTracking();
+          const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+          fillLight.position.set(-5, 5, -5);
+          scene.add(fillLight);
 
-          loadAvatar();
+          setupFileUpload();
           animate();
 
           window.addEventListener('resize', onWindowResize, false);
@@ -127,64 +127,30 @@
       }
 
       function loadAvatar() {
-          const loader = new THREE.GLTFLoader();
-          const avatarUrl = 'https://models.readyplayer.me/6738baadbdc370b5cbbaba87.glb';
+          return new Promise((resolve, reject) => {
+              const loader = new THREE.GLTFLoader();
+              const avatarUrl = 'https://models.readyplayer.me/6738baadbdc370b5cbbaba87.glb';
 
-          loader.load(
-              avatarUrl,
-              (gltf) => {
-                  avatar = gltf.scene;
-                  scene.add(avatar);
+              loader.load(
+                  avatarUrl,
+                  (gltf) => {
+                      avatar = gltf.scene;
+                      scene.add(avatar);
 
-                  avatar.position.set(1, -6.3, 0);
-                  avatar.rotation.y = -0.2;
-                  avatar.scale.set(4, 4, 2);
+                      avatar.position.set(0, -1.5, 0);
+                      avatar.rotation.y = 0;
+                      avatar.scale.set(2, 2, 2);
 
-                  // Find all the bones we need
-                  avatar.traverse((node) => {
-                      if (node.isMesh && node.morphTargetDictionary) {
-                          mouthOpenIndex = node.morphTargetDictionary['mouthOpen'];
-                      }
-                      if (node.isBone) {
-                          console.log('Found bone:', node.name); // Debug bone names
-                          if (node.name.includes('Head')) {
-                              headBoneNode = node;
-                              initialRotations.head.copy(node.rotation);
-                              console.log('Head bone found:', node.name); // Debug log
-                          }
-                          if (node.name.includes('Spine2')) {
-                              spineBoneNode = node;
-                              initialRotations.spine.copy(node.rotation);
-                          }
-                          if (node.name.includes('LeftShoulder')) {
-                              leftShoulderNode = node;
-                              initialRotations.leftShoulder.copy(node.rotation);
-                          }
-                          if (node.name.includes('RightShoulder')) {
-                              rightShoulderNode = node;
-                              initialRotations.rightShoulder.copy(node.rotation);
-                          }
-                          if (node.name.includes('LeftArm')) {
-                              leftArmNode = node;
-                              initialRotations.leftArm.copy(node.rotation);
-                          }
-                          if (node.name.includes('RightArm')) {
-                              rightArmNode = node;
-                              initialRotations.rightArm.copy(node.rotation);
-                          }
-                      }
-                  });
-
-                  setupSpeechButton();
-                  startTeacherBehavior();
-              },
-              (xhr) => {
-                  console.log('Loading progress:', (xhr.loaded / xhr.total * 100) + '% loaded');
-              },
-              (error) => {
-                  console.error('Error loading avatar:', error);
-              }
-          );
+                      setupAvatarBones(gltf);
+                      startTeacherBehavior();
+                      startBlinking();
+                      
+                      resolve();
+                  },
+                  undefined,
+                  reject
+              );
+          });
       }
 
       function startTeacherBehavior() {
@@ -269,50 +235,48 @@
       }
 
       function startSpeaking() {
-          if (!window.speechSynthesis) {
-              alert('Speech Synthesis API is not supported in this browser.');
+          if (!window.speechSynthesis || !speechText) {
+              alert('Either Speech Synthesis is not supported or no content has been processed yet.');
               return;
           }
 
-          const startButton = document.getElementById('startButton');
-          startButton.textContent = 'Stop Speaking';
-          isSpeaking = true;
-
           const speech = new SpeechSynthesisUtterance(speechText);
-          speech.rate = 0.9;  // Slightly slower for clarity
-          speech.pitch = 1.1; // Slightly higher pitch
+          speech.rate = 0.9;
+          speech.pitch = 1.1;
           speech.volume = 1;
 
-          let lastMouthValue = 0;
-          const mouthSpeed = 0.15;
-
-          function updateMouth() {
-              if (!isSpeaking) return;
-
-              avatar.traverse((child) => {
-                  if (child.isMesh && child.morphTargetInfluences && mouthOpenIndex !== null) {
-                      // Natural mouth movement
-                      const targetValue = Math.random() * 0.8;
-                      const oscillation = Math.sin(Date.now() * 0.01) * 0.1;
-                      lastMouthValue += (targetValue - lastMouthValue) * mouthSpeed;
-                      child.morphTargetInfluences[mouthOpenIndex] = lastMouthValue + oscillation;
-                  }
-              });
-
-              currentAnimation = requestAnimationFrame(updateMouth);
+          // Get available voices and select a good one
+          const voices = window.speechSynthesis.getVoices();
+          const preferredVoice = voices.find(voice => 
+              voice.name.includes('Google') || voice.name.includes('Natural') || 
+              voice.name.includes('Female') || voice.name.includes('en-US')
+          );
+          if (preferredVoice) {
+              speech.voice = preferredVoice;
           }
 
-          speech.onstart = () => {
-              updateMouth();
+          // Setup captions
+          const captionsDiv = document.getElementById('captions');
+          let currentText = '';
+          
+          speech.onboundary = function(event) {
+              const text = speechText.substring(event.charIndex);
+              currentText = text.split('.')[0] + '.';
+              captionsDiv.textContent = currentText;
           };
+
+          isSpeaking = true;
+          startMouthAnimation();
 
           speech.onend = () => {
               stopSpeaking();
+              captionsDiv.textContent = '';
           };
 
           speech.onerror = (event) => {
               console.error('Speech synthesis error:', event);
               stopSpeaking();
+              captionsDiv.textContent = '';
           };
 
           window.speechSynthesis.speak(speech);
@@ -336,11 +300,144 @@
           startButton.textContent = 'Start Speaking';
       }
 
+      // Add file upload handling functions after init()
+      function setupFileUpload() {
+          const uploadButton = document.getElementById('uploadButton');
+          const fileInput = document.getElementById('fileInput');
+          const loadingDiv = document.getElementById('loading');
+
+          uploadButton.addEventListener('click', async () => {
+              const file = fileInput.files[0];
+              if (!file) {
+                  alert('Please select a file first!');
+                  return;
+              }
+
+              loadingDiv.style.display = 'block';
+              
+              const formData = new FormData();
+              formData.append('file', file);
+
+              try {
+                  const response = await fetch('http://localhost:5000/process-file', {
+                      method: 'POST',
+                      body: formData
+                  });
+
+                  if (!response.ok) {
+                      throw new Error('Error processing file');
+                  }
+
+                  const data = await response.json();
+                  
+                  if (!data.summary) {
+                      throw new Error('No content could be extracted');
+                  }
+
+                  // Store the summary for speech
+                  speechText = data.summary;
+                  
+                  // Load avatar only after successful file processing
+                  await loadAvatar();
+                  
+                  // Show captions container
+                  document.getElementById('captions-container').style.display = 'block';
+                  
+                  // Start speaking after a short delay
+                  setTimeout(() => {
+                      startSpeaking();
+                  }, 1000);
+                  
+              } catch (error) {
+                  console.error('Error:', error);
+                  alert(error.message);
+              } finally {
+                  loadingDiv.style.display = 'none';
+              }
+          });
+      }
+
+      function validateFileType(file) {
+          const allowedTypes = ['.pdf', '.pptx', '.txt'];
+          const fileExtension = file.name.toLowerCase().slice((file.name.lastIndexOf(".") - 1 >>> 0) + 2);
+          
+          if (!allowedTypes.includes(`.${fileExtension}`)) {
+              alert(`Invalid file type. Please upload ${allowedTypes.join(', ')} files only.`);
+              return false;
+          }
+          return true;
+      }
+
+      function startMouthAnimation() {
+          const animateMouth = () => {
+              if (!isSpeaking) return;
+
+              avatar.traverse((child) => {
+                  if (child.isMesh && child.morphTargetInfluences && mouthOpenIndex !== null) {
+                      // Create a natural-looking mouth movement
+                      const time = Date.now() * 0.005;
+                      const mouthOpen = Math.sin(time) * 0.5 + 0.5; // Value between 0 and 1
+                      child.morphTargetInfluences[mouthOpenIndex] = mouthOpen * 0.5; // Reduce the maximum opening
+                  }
+              });
+
+              currentAnimation = requestAnimationFrame(animateMouth);
+          };
+
+          animateMouth();
+      }
+
+      function setupAvatarBones(gltf) {
+          avatar.traverse((node) => {
+              // Find mouth morph target
+              if (node.isMesh && node.morphTargetDictionary) {
+                  if (node.morphTargetDictionary.hasOwnProperty('mouthOpen')) {
+                      mouthOpenIndex = node.morphTargetDictionary['mouthOpen'];
+                  }
+                  if (node.morphTargetDictionary.hasOwnProperty('eyesClosed')) {
+                      eyeBlinkIndex = node.morphTargetDictionary['eyesClosed'];
+                  }
+              }
+
+              // Store initial bone rotations
+              if (node.isBone) {
+                  switch(node.name.toLowerCase()) {
+                      case 'head':
+                          headBoneNode = node;
+                          initialRotations.head.copy(node.rotation);
+                          break;
+                      case 'spine':
+                          spineBoneNode = node;
+                          initialRotations.spine.copy(node.rotation);
+                          break;
+                      case 'leftshoulder':
+                          leftShoulderNode = node;
+                          initialRotations.leftShoulder.copy(node.rotation);
+                          break;
+                      case 'rightshoulder':
+                          rightShoulderNode = node;
+                          initialRotations.rightShoulder.copy(node.rotation);
+                          break;
+                      case 'leftarm':
+                          leftArmNode = node;
+                          initialRotations.leftArm.copy(node.rotation);
+                          break;
+                      case 'rightarm':
+                          rightArmNode = node;
+                          initialRotations.rightArm.copy(node.rotation);
+                          break;
+                  }
+              }
+          });
+      }
+
       init();
   </script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script type="module" src="index.js"></script>
     
+    <div id="captions-container" style="display: none;">
+        <div id="captions"></div>
+    </div>
 </body>
 </html>
