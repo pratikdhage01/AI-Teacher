@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Teacher</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- User Profile Section -->
+            <div class="user-profile">
+                <div class="profile-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3 id="userNameDisplay">Welcome!</h3>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="nav-links">
+                <button id="teacherBtn" class="nav-link">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Teacher</span>
+                </button>
+                <button id="chatbotBtn" class="nav-link">
+                    <i class="fas fa-robot"></i>
+                    <span>Chatbot</span>
+                </button>
+                <button id="logoutBtn" class="nav-link logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="welcome-message">
+                <h1>Hello, <span id="mainUserName">User</span>!</h1>
+                <p class="welcome-text">Welcome to AI Teacher – your personalized learning companion!</p>
+            </div>
+
+            <div class="progress-section">
+                <h2 class="progress-title">Track your progress!</h2>
+                <div><p>Activity Chart</p></div>
+        
+                <div class="activity-chart">
+                    <div class="chart-header">
+                        <div class="month-selector">
+                            <button id="prevMonth" class="month-btn">&lt;</button>
+                            <span id="currentMonth">November 2023</span>
+                            <button id="nextMonth" class="month-btn">&gt;</button>
+                        </div>
+                        <div class="activity-legend">
+                            <span>Less</span>
+                            <div class="legend-boxes">
+                                <div class="box no-activity"></div>
+                                <div class="box low-activity"></div>
+                                <div class="box medium-activity"></div>
+                                <div class="box high-activity"></div>
+                            </div>
+                            <span>More</span>
+                        </div>
+                    </div>
+                    <div class="activity-grid" id="activityGrid"></div>
+                </div>
+            </div>
+
+            <div class="start-journey">
+                <p class="journey-text">To make learning smarter, easier, and more fun. Let's start your journey today!</p>
+                <a href="index.html" class="cta-button">Click Here</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html> 
