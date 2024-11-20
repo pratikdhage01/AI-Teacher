@@ -36,9 +36,51 @@
       let mouthOpenIndex = null;
       let isSpeaking = false;
       let currentAnimation = null;
+      let headBoneNode = null;
+      let spineBoneNode = null;
+      let leftShoulderNode = null;
+      let rightShoulderNode = null;
+      let leftArmNode = null;
+      let rightArmNode = null;
+      let initialRotations = {
+          head: new THREE.Euler(),
+          spine: new THREE.Euler(),
+          leftShoulder: new THREE.Euler(),
+          rightShoulder: new THREE.Euler(),
+          leftArm: new THREE.Euler(),
+          rightArm: new THREE.Euler()
+      };
+      let eyeBlinkIndex = null;
 
       // Predefined text to speak
       const speechText = `Hello! I am your virtual avatar.`;
+
+      // Add new variables for teacher-specific gestures
+      let isExplaining = false;
+      let currentPosture = 'neutral';
+      let lastGestureTime = 0;
+
+      // Add these variables at the top with other declarations
+      let mouseX = 0;
+      let mouseY = 0;
+      let targetRotationX = 0;
+      let targetRotationY = 0;
+
+      // Add this function to track mouse movement
+      function setupMouseTracking() {
+          document.addEventListener('mousemove', (event) => {
+              // Get mouse position relative to the window center
+              mouseX = (event.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+              mouseY = (event.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+              
+              // Convert mouse position to rotation angles
+              targetRotationY = mouseX * 0.5; // Horizontal look
+              targetRotationX = -mouseY * 0.3; // Vertical look (inverted)
+              
+              // Debug log
+              console.log('Mouse moved:', { mouseX, mouseY, targetRotationX, targetRotationY });
+          });
+      }
 
       function init() {
           scene = new THREE.Scene();
@@ -69,6 +111,9 @@
           directionalLight.position.set(2, 5, 7.5);
           scene.add(directionalLight);
 
+          // Setup mouse tracking
+          setupMouseTracking();
+
           loadAvatar();
           animate();
 
@@ -95,18 +140,116 @@
                   avatar.rotation.y = -0.2;
                   avatar.scale.set(4, 4, 2);
 
-                  avatar.traverse((child) => {
-                      if (child.isMesh && child.morphTargetDictionary) {
-                          console.log('Available Blend Shapes:', child.morphTargetDictionary);
-                          mouthOpenIndex = child.morphTargetDictionary['mouthOpen'];
+                  // Find all the bones we need
+                  avatar.traverse((node) => {
+                      if (node.isMesh && node.morphTargetDictionary) {
+                          mouthOpenIndex = node.morphTargetDictionary['mouthOpen'];
+                      }
+                      if (node.isBone) {
+                          console.log('Found bone:', node.name); // Debug bone names
+                          if (node.name.includes('Head')) {
+                              headBoneNode = node;
+                              initialRotations.head.copy(node.rotation);
+                              console.log('Head bone found:', node.name); // Debug log
+                          }
+                          if (node.name.includes('Spine2')) {
+                              spineBoneNode = node;
+                              initialRotations.spine.copy(node.rotation);
+                          }
+                          if (node.name.includes('LeftShoulder')) {
+                              leftShoulderNode = node;
+                              initialRotations.leftShoulder.copy(node.rotation);
+                          }
+                          if (node.name.includes('RightShoulder')) {
+                              rightShoulderNode = node;
+                              initialRotations.rightShoulder.copy(node.rotation);
+                          }
+                          if (node.name.includes('LeftArm')) {
+                              leftArmNode = node;
+                              initialRotations.leftArm.copy(node.rotation);
+                          }
+                          if (node.name.includes('RightArm')) {
+                              rightArmNode = node;
+                              initialRotations.rightArm.copy(node.rotation);
+                          }
                       }
                   });
 
                   setupSpeechButton();
+                  startTeacherBehavior();
               },
-              undefined,
-              (error) => console.error('Error loading avatar:', error)
+              (xhr) => {
+                  console.log('Loading progress:', (xhr.loaded / xhr.total * 100) + '% loaded');
+              },
+              (error) => {
+                  console.error('Error loading avatar:', error);
+              }
           );
+      }
+
+      function startTeacherBehavior() {
+          console.log('Starting teacher behavior');
+          
+          function animate() {
+              const time = Date.now() * 0.001;
+
+              // Head tracking movement
+              if (headBoneNode) {
+                  // Smoothly interpolate current rotation to target rotation
+                  const currentX = headBoneNode.rotation.x;
+                  const currentY = headBoneNode.rotation.y;
+                  
+                  headBoneNode.rotation.x = initialRotations.head.x + 
+                      (targetRotationX - currentX + initialRotations.head.x) * 0.05;
+                  headBoneNode.rotation.y = initialRotations.head.y + 
+                      (targetRotationY - currentY + initialRotations.head.y) * 0.05;
+                  
+                  // Debug log
+                  console.log('Head rotation:', { 
+                      x: headBoneNode.rotation.x, 
+                      y: headBoneNode.rotation.y 
+                  });
+              }
+
+              // Keep existing breathing and other animations
+              if (spineBoneNode) {
+                  spineBoneNode.rotation.x = initialRotations.spine.x + Math.sin(time * 0.8) * 0.05;
+              }
+
+              if (leftShoulderNode && rightShoulderNode) {
+                  const breatheAmount = Math.sin(time * 0.8) * 0.03;
+                  leftShoulderNode.rotation.x = initialRotations.leftShoulder.x + breatheAmount;
+                  rightShoulderNode.rotation.x = initialRotations.rightShoulder.x + breatheAmount;
+              }
+
+              requestAnimationFrame(animate);
+          }
+
+          animate();
+      }
+
+      function startBlinking() {
+          function blink() {
+              avatar.traverse((node) => {
+                  if (node.isMesh && node.morphTargetInfluences && node.morphTargetDictionary) {
+                      const blinkIndex = node.morphTargetDictionary['eyesClosed'];
+                      if (blinkIndex !== undefined) {
+                          // Quick blink animation
+                          node.morphTargetInfluences[blinkIndex] = 1;
+                          setTimeout(() => {
+                              node.morphTargetInfluences[blinkIndex] = 0;
+                          }, 150);
+                      }
+                  }
+              });
+
+              // Random interval between 2 and 6 seconds
+              const nextBlink = 2000 + Math.random() * 4000;
+              setTimeout(blink, nextBlink);
+          }
+
+          // Start the blinking
+          blink();
       }
 
       function animate() {
