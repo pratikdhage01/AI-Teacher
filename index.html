@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar</title>
+    <link rel="stylesheet" href="Teacher.css">
+</head>
+<body>
+    <!-- Add this button right after the body tag -->
+    <div id="doubt-button-container">
+        <a href="chatbot.html" class="doubt-btn">Any doubts? Ask me!!</a>
+    </div>
+
+    <!-- Replace file upload section with popup trigger button -->
+    <div id="file-upload-section">
+        <h2>Upload Your Learning Material</h2>
+        <button onclick="showUploadPopup()" class="upload-btn">Upload File</button>
+    </div>
+
+    <!-- Add popup markup -->
+    <div class="popup-overlay" id="uploadPopup">
+        <div class="popup-content">
+            <span class="close-popup" onclick="hideUploadPopup()">&times;</span>
+            <h2>Upload Learning Material</h2>
+            <div class="upload-area" id="dropZone" onclick="triggerFileInput()">
+                <p>Drag & Drop files here</p>
+                <p>or</p>
+                <p>Click to select files</p>
+                <input type="file" id="fileInput" accept=".pdf,.pptx,.txt" style="display: none" onchange="handleFileSelect(event)">
+            </div>
+            <div class="file-name" id="fileName"></div>
+            <button class="upload-btn" id="uploadButton">Upload and Start</button>
+        </div>
+    </div>
+
+    <div id="avatar"></div>
+
+    <div id="loading" style="display: none;">
+        Processing file...
+        <div class="spinner"></div>
+    </div>
+
+
+    <div id="captions-container" style="display: none;">
+        <div id="captions"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
