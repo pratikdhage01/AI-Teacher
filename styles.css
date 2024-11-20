@@ -1,9 +1,10 @@
 /* styles.css */
 :root {
     --button-color: rgb(71, 85, 85); 
-    --button-color-hover:rgb(126, 150, 150);
-    --learning-color-hover:rgba(9, 52, 52, 0.726);
-  }
+    --button-color-hover: rgb(126, 150, 150);
+    --learning-color-hover: rgba(9, 52, 52, 0.726);
+}
+
 body,
 html {
     overflow: hidden;
@@ -33,7 +34,7 @@ html {
     display: block;
     position: absolute;
     top: 50px;
-    left:1300px;
+    left: 1300px;
     height: 50px;
 }
 
@@ -65,7 +66,8 @@ html {
     width: 100px;
     font-size: 20px;
 }
-#speak:hover{
+
+#speak:hover {
     background-color: var(--button-color-hover);
 }
 
@@ -119,21 +121,22 @@ html {
     /* background-color: rgba(255, 255, 255, 0.56); */
 }
 
-.buttons{
+.buttons {
     display: flex;
-    flex-direction:row;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-
 }
-.button{
+
+.button {
     cursor: pointer;
     background-color: var(--button-color);
     border-radius: 10px;
     padding: 10px;
     margin: 10px;
 }
-.button:hover{
+
+.button:hover {
     background-color: var(--button-color-hover);
     border-radius: 10px;
     padding: 10px;
@@ -141,7 +144,6 @@ html {
 }
 
 .new-button {
-    /* Add your desired styles here */
     background-color: var(--button-color);
     color: #fff;
     padding: 10px 20px;
@@ -155,7 +157,7 @@ html {
     background-color: var(--button-color-hover);
 }
 
-#learning{
+#learning {
     overflow: auto;
     background-color: var(--learning-color-hover);
     display: none;
@@ -170,7 +172,7 @@ html {
     padding: 20px;
 }
 
-#take-assesment{
+#take-assesment {
     display: none;
     position: absolute;
     background-color: var(--button-color);
@@ -185,18 +187,18 @@ html {
     /* z-index: 1; */
 }
 
-.takeAssessmentButton:hover{
+.takeAssessmentButton:hover {
     background-color: var(--button-color-hover);
 }
 
-#assessment-container{
+#assessment-container {
     display: block;
     position: absolute;
     top: 25%;
     left: 25%;
 }
 
-#assesmentsubmit{
+#assesmentsubmit {
     display: none;
 }
 
@@ -230,18 +232,15 @@ html {
     padding: 20px;
 }
 
-/* Add some spacing between sections */
 .summary-content h3:not(:first-child) {
     margin-top: 32px;
 }
 
-/* Style for important points */
 .summary-content p strong {
     color: #2c3e50;
     font-weight: 600;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
     .summary-content {
         padding: 15px;
@@ -301,18 +300,15 @@ html {
     text-align: justify;
 }
 
-/* Highlight important concepts */
 .teaching-text strong {
     color: #16a085;
     font-weight: 600;
 }
 
-/* Add some visual separation between sections */
 .teaching-content > *:not(:last-child) {
     margin-bottom: 20px;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .teaching-content {
         padding: 20px;
@@ -352,14 +348,14 @@ html {
 #captions-container {
     position: fixed;
     bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 5%;
+    transform: translateX(0);
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     padding: 15px 25px;
     border-radius: 10px;
-    max-width: 80%;
-    text-align: center;
+    max-width: 25%;
+    text-align: left;
     z-index: 1000;
 }
 
