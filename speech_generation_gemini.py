@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Configure Gemini API
-genai.configure(api_key='AIzaSyBbMqcZP9FSOTB7yLCNkVXMu7XpJ5JefEs')
+genai.configure(api_key='YOUR API KEY HERE')
 model = genai.GenerativeModel('gemini-pro')
 
 def process_pdf(file):
